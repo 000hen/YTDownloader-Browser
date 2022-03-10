@@ -87,7 +87,7 @@ async function sendToServer(data) {
                                 downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
                                 resolve();
                             } catch (err) {
-                                r();
+                                setTimeout(async () => resolve(await r()), 1000);
                             };
                         });
                     }

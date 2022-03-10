@@ -83,7 +83,7 @@ function dall(ref, title, filename, ffmpeg) {
                         downloadAsFile(ffmpeg.FS("readFile", `${videoID}.mp4`), filename);
                         resolve();
                     } catch (err) {
-                        r();
+                        setTimeout(async () => resolve(await r()), 1000);
                     };
                 });   
             }

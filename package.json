@@ -1,0 +1,24 @@
+{
+  "name": "ytdownload-browser",
+  "version": "1.0.0",
+  "description": "Download the YouTube videos through browser.",
+  "main": "./src/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "YT",
+    "YouTube"
+  ],
+  "author": "Muisnow",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ffmpeg/core": "^0.10.0",
+    "@ffmpeg/ffmpeg": "^0.10.1",
+    "browserify": "^17.0.0",
+    "browserify-fs": "^1.0.0",
+    "uuid": "^8.3.2",
+    "ytdl-core": "^4.11.0",
+    "ytpl": "^2.3.0"
+  }
+}

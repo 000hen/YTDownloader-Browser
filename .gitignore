@@ -1,0 +1,9 @@
+# git: github.com/000hen/
+
+node_modules/
+ffmpeg.exe*
+songs/
+videos/
+temp/
+build/
+rename.js

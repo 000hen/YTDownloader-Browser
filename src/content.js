@@ -169,7 +169,6 @@ window.addEventListener('load', e => {
                     h.insertBefore(d, h.firstChild);
                     d.addEventListener("click", event => {
                         event.preventDefault();
-                        alert("Download the video!");
                         makenof({
                             message: "Download the video!",
                             type: "info"

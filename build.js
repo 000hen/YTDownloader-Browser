@@ -1,0 +1,17 @@
+const cp = require('child_process');
+const fs = require('fs');
+
+try {
+    fs.existsSync("build") ? null : fs.mkdirSync("build");
+    fs.copyFileSync("src/manifest.json", "build/manifest.json");
+    fs.copyFileSync("src/popup.html", "build/popup.html");
+    fs.copyFileSync("src/popupScript.js", "build/popupScript.js");
+    cp.execSync("browserify src/content.js -o build/content-bundle.js");
+    cp.execSync("browserify src/main.js -o build/background-bundle.js");
+} catch (err) {
+    console.log(err);
+    process.exit(1);
+}
+
+console.log("\x1b[32mBuild Successful\x1b[0m");
+process.exit(0);

@@ -11,7 +11,7 @@ const ffmpeg = createFFmpeg({
 const fs = require('browserify-fs');
 const downloadProgessLimit = 10;
 
-function downloadAsFile(blob, filename) {
+const downloadAsFile = global.downloadAsFile = (blob, filename) => {
     const link = document.createElement("a");
     link.href = URL.createObjectURL(new Blob([blob]));
     link.download = filename;
@@ -21,7 +21,7 @@ function downloadAsFile(blob, filename) {
     return;
 }
 
-function sendPageMessage(message, type) {
+const sendPageMessage = global.sendPageMessage = (message, type) => {
     try {
         chrome.tabs.query({
             active: true,
@@ -58,8 +58,8 @@ async function sendToServer(data) {
             console.log(`\x1b[33mDownloading ${title}, By ${author}...\x1b[0m`);
             sendPageMessage(`Downloading ${title}, By ${author}...`, "info");
             if (unjson.type === "video") {
-                // var a = require("./assents/download.js");
-                // resolve(await a.dall(url, title, toFilename(title)))
+                var a = require("./download.js");
+                resolve(await a.dall(url, title, `${toFilename(title)}.mp4`, ffmpeg))
             } else {
                 var id = uuid.v4();
                 // // var file = fs.createWriteStream(`songs/${toFilename(title)}.mp3`);
@@ -79,10 +79,19 @@ async function sendToServer(data) {
                     sendPageMessage(`Converting ${title} from WebM to MP3...`, "info");
                     // downloadAsFile(buffer, "test")
                     ffmpeg.FS('writeFile', `${id}`, buffer);
-                    await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
-                    // child_process.execSync(`ffmpeg -y -loglevel 0 -hide_banner -i "temp/${id}" -acodec libmp3lame -ab 128k -ar 44100 -ac 2 "${toFilename(title)}.mp3"`);
-                    // fs.unlink(`${id}`);
-                    downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
+
+                    function r() {
+                        return new Promise(async (resolve, reject) => {
+                            try {
+                                await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
+                                downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
+                                resolve();
+                            } catch (err) {
+                                r();
+                            };
+                        });
+                    }
+                    await r();
 
                     console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
                     sendPageMessage(`Downloaded ${title}`, "success");

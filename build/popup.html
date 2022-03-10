@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <style>
+            * {
+                transition: .3s;
+            }
+            body {
+                width: 300px;
+                height: 150px;
+                background-color: #707070;
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                border-radius: 15px;
+            }
+            #btn {
+                display: flex;
+                height: 60px;
+            }
+            #btn button {
+                flex: 1 1;
+                border: none;
+                border-radius: 10px;
+                padding: 5px;
+                margin: 5px;
+                display: block;
+                color: #fff;
+            }
+            #btn button:hover {
+                transform: translate(5px, -5px);
+                box-shadow: -5px 5px 5px 0 #000;
+            }
+            #btn button:active {
+                transform: translate(0, 0);
+                box-shadow: none;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>YouTube-Downloader</h1>
+        <div id="btn">
+            <button style="background-color: #0066ff;" id="d">Download Video/Music</button>
+            <button style="background-color: #ff4141;" id="c">Cancel</button>
+        </div>
+    </body>
+    <script src="popupScript.js"></script>
+</html>

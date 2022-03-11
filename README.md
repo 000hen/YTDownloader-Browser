@@ -13,11 +13,13 @@ This is a Chrome extension that allows you to download videos from YouTube/YouTu
 
 ## Installation
 
-_You can download the executable file from the [release page](https://github.com/000hen/YouTube-Downloader/releases/latest)_
+_You can download the extension from the [release page](https://github.com/000hen/YouTube-Downloader/releases/latest)_
 
  1. Download the repository.
- 2. Install the Chrome extension with developer mode.
- 3. Enjoy!
+ 2. Install the npm package (`npm install`).
+ 3. Build the extension (`npm run build`).
+ 4. Install the Chrome extension in `build` folder with developer mode.
+ 5. Enjoy!
 
 ## How to Download The Videos or Songs
 
@@ -47,6 +49,9 @@ Or the download button in the video page or song page.
  ![Notifications](https://cdn.discordapp.com/attachments/698551378745884835/951779185557377054/unknown.png)
 
  * Popup Window:  
- ![Popup Window](hhttps://cdn.discordapp.com/attachments/698551378745884835/951785505090064414/unknown.png)
+ ![Popup Window](https://cdn.discordapp.com/attachments/698551378745884835/951785505090064414/unknown.png)
+
+ * Background Console:
+ ![Background Console](https://cdn.discordapp.com/attachments/698551378745884835/951785721969147924/unknown.png)
 
 ## Enjoy!

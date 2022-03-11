@@ -2,14 +2,56 @@ const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const uuid = require('uuid');
 const {
-    createFFmpeg,
-    fetchFile
+    createFFmpeg
 } = require('@ffmpeg/ffmpeg');
 const ffmpeg = createFFmpeg({
     log: false
 });
-const fs = require('browserify-fs');
 const downloadProgessLimit = 10;
+
+var toFilename = string => string.replace(/\n/g, " ").replace(/[<>:"/\\|?*\x00-\x1F]| +$/g, "").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/, x => x + "_");
+
+var nowConverting = null;
+var waitConverts = global.waitConverts = [];
+const converter = global.converter = async () => {
+    /*
+    Example of waitConverts:
+        {
+            "title": "title",
+            "videoID": "videoID",
+            "audioID": "audioID"
+        }
+    */
+
+    if (nowConverting) return;
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
+    var times = 0;
+
+    while (waitConverts.length > 0) {
+        nowConverting = waitConverts.shift();
+        console.log(`\x1b[33mConverting ${nowConverting.title} from WebM to MP3...\x1b[0m`);
+        sendPageMessage(`Converting ${nowConverting.title} from WebM to MP3...`, "info");
+        if (!nowConverting.videoID) {
+            await ffmpeg.run('-i', `${nowConverting.audioID}`, `${nowConverting.audioID}.mp3`);
+            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.audioID}.mp3`), `${toFilename(nowConverting.title)}.mp3`);
+        } else {
+            await ffmpeg.run("-i", `${nowConverting.videoID}`, "-i", `${nowConverting.audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${nowConverting.videoID}.mp4`);
+            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), toFilename(nowConverting.title));
+        }
+        console.log(`\x1b[32mDownloaded ${nowConverting.title}\x1b[0m`);
+        sendPageMessage(`Downloaded ${nowConverting.title}`, "success");
+        times++;
+    }
+    nowConverting = null;
+    console.log(`\x1b[32mDownloaded all file, in this session YouTube-Downloader downloaded ${times} file(s)\x1b[0m`);
+    sendPageMessage(`Downloaded all file, in this session YouTube-Downloader downloaded ${times} file(s)`, "success");
+}
+
+waitConverts.push = (e) => {
+    Array.prototype.push.call(waitConverts, e);
+    converter();
+}
 
 const downloadAsFile = global.downloadAsFile = (blob, filename) => {
     const link = document.createElement("a");
@@ -36,7 +78,6 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
 }
 
 async function sendToServer(data) {
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
     var nowdwn = 0;
     var done = 0;
     var unjson = data;
@@ -54,7 +95,6 @@ async function sendToServer(data) {
             var info = await ytdl.getBasicInfo(url);
             var title = info.player_response.videoDetails.title;
             var author = info.player_response.videoDetails.author;
-            var toFilename = string => string.replace(/\n/g, " ").replace(/[<>:"/\\|?*\x00-\x1F]| +$/g, "").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/, x => x + "_");
             console.log(`\x1b[33mDownloading ${title}, By ${author}...\x1b[0m`);
             sendPageMessage(`Downloading ${title}, By ${author}...`, "info");
             if (unjson.type === "video") {
@@ -75,31 +115,32 @@ async function sendToServer(data) {
 
                 stream.on('end', async () => {
                     var buffer = Buffer.concat(file);
-                    console.log(`\x1b[33mConverting ${title} from WebM to MP3...\x1b[0m`);
-                    sendPageMessage(`Converting ${title} from WebM to MP3...`, "info");
                     // downloadAsFile(buffer, "test")
                     ffmpeg.FS('writeFile', `${id}`, buffer);
+                    waitConverts.push({
+                        title: title,
+                        videoID: null,
+                        audioID: id
+                    });
 
-                    function r() {
-                        return new Promise(async (resolve, reject) => {
-                            try {
-                                await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
-                                downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
-                                resolve();
-                            } catch (err) {
-                                setTimeout(async () => resolve(await r()), 1000);
-                            };
-                        });
-                    }
-                    await r();
+                    // function r() {
+                    //     return new Promise(async (resolve, reject) => {
+                    //         try {
+                    //             await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
+                    //             downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
+                    //             resolve();
+                    //         } catch (err) {
+                    //             setTimeout(async () => resolve(await r()), 1000);
+                    //         };
+                    //     });
+                    // }
+                    // await r();
 
-                    console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-                    sendPageMessage(`Downloaded ${title}`, "success");
+                    // console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
+                    // sendPageMessage(`Downloaded ${title}`, "success");
                     resolve(true);
                 });
                 stream.on('error', err => {
-                    file.end();
-                    fs.unlink(`${toFilename(title)}.mp3`);
                     console.log(`\x1b[31mDownload ${title} Failed: ${err}\x1b[0m`, err);
                     sendPageMessage(`Download ${title} Failed: ${err}`, "error");
                     if (errVds.findIndex(e => e === url) === -1) {
@@ -132,8 +173,6 @@ async function sendToServer(data) {
                             sendPageMessage(`Failed: ${video}`, "error");
                         }
                     }
-                    console.log(`\x1b[32mDownloaded all file, in this session YouTube-Downloader downloaded ${p} file(s)\x1b[0m`);
-                    sendPageMessage(`Downloaded all file, in this session YouTube-Downloader downloaded ${p} file(s)`, "success");
                 }
             });
             nowdwn++;

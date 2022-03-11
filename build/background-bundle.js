@@ -17476,8 +17476,8 @@ const converter = global.converter = async () => {
 
     while (waitConverts.length > 0) {
         nowConverting = waitConverts.shift();
-        console.log(`\x1b[33mConverting ${nowConverting.title} from WebM to MP3...\x1b[0m`);
-        sendPageMessage(`Converting ${nowConverting.title} from WebM to MP3...`, "info");
+        console.log(`\x1b[33mConverting ${nowConverting.title}...\x1b[0m`);
+        sendPageMessage(`Converting ${nowConverting.title}...`, "info");
         if (!nowConverting.videoID) {
             await ffmpeg.run('-i', `${nowConverting.audioID}`, `${nowConverting.audioID}.mp3`);
             ffmpeg.FS("unlink", `${nowConverting.audioID}`);
@@ -17510,6 +17510,7 @@ const downloadAsFile = global.downloadAsFile = (blob, filename) => {
     link.download = filename;
     link.click();
     link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 60000);
 
     return;
 }

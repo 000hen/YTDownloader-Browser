@@ -63,6 +63,7 @@ const downloadAsFile = global.downloadAsFile = (blob, filename) => {
     link.download = filename;
     link.click();
     link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 60000);
 
     return;
 }

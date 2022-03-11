@@ -11,7 +11,7 @@
             }
             body {
                 width: 300px;
-                height: 150px;
+                height: 200px;
                 background-color: #707070;
                 color: #fff;
                 display: flex;
@@ -22,16 +22,19 @@
             }
             #btn {
                 display: flex;
-                height: 60px;
+                flex-direction: column;
+                flex-wrap: nowrap;
+                width: 100%;
             }
             #btn button {
                 flex: 1 1;
                 border: none;
                 border-radius: 10px;
-                padding: 5px;
-                margin: 5px;
+                padding: 8px;
+                margin-bottom: 5px;
                 display: block;
                 color: #fff;
+                width: 100%;
             }
             #btn button:hover {
                 transform: translate(5px, -5px);
@@ -46,7 +49,9 @@
     <body>
         <h1>YouTube-Downloader</h1>
         <div id="btn">
-            <button style="background-color: #0066ff;" id="d">Download Video/Music</button>
+            <button style="background-color: #4891ff;" id="da">Auto Download</button>
+            <button style="background-color: #4891ff;" id="dm">Download as Audio</button>
+            <button style="background-color: #4891ff;" id="dv">Download as Video</button>
             <button style="background-color: #ff4141;" id="c">Cancel</button>
         </div>
     </body>

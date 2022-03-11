@@ -17431,24 +17431,6 @@ function dall(ref, title, filename, ffmpeg) {
                 videoID: videoID,
                 audioID: audioID
             });
-            // console.log(`\x1b[33mStart making video and audio to "${title}"\x1b[0m`);
-            // sendPageMessage(`Start making video and audio to "${title}"`, "info");
-
-            // function r() {
-            //     return new Promise(async (resolve, reject) => {
-            //         try {
-            //             await ffmpeg.run("-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${videoID}.mp4`);
-            //             downloadAsFile(ffmpeg.FS("readFile", `${videoID}.mp4`), filename);
-            //             resolve();
-            //         } catch (err) {
-            //             setTimeout(async () => resolve(await r()), 1000);
-            //         };
-            //     });   
-            // }
-            // await r();
-
-            // console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-            // sendPageMessage(`Downloaded ${title}`, "success");
 
             resolve(true);
         }
@@ -17485,7 +17467,6 @@ const converter = global.converter = async () => {
     */
 
     if (nowConverting) return;
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
 
     var times = 0;
 
@@ -17498,7 +17479,7 @@ const converter = global.converter = async () => {
             downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.audioID}.mp3`), `${toFilename(nowConverting.title)}.mp3`);
         } else {
             await ffmpeg.run("-i", `${nowConverting.videoID}`, "-i", `${nowConverting.audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${nowConverting.videoID}.mp4`);
-            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), toFilename(nowConverting.title));
+            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), `${toFilename(nowConverting.title)}.mp4`);
         }
         console.log(`\x1b[32mDownloaded ${nowConverting.title}\x1b[0m`);
         sendPageMessage(`Downloaded ${nowConverting.title}`, "success");
@@ -17530,6 +17511,7 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
             active: true,
             currentWindow: true
         }, (tabs) => {
+            if (!tabs[0]) return;
             chrome.tabs.sendMessage(tabs[0].id, {
                 message: message,
                 type: type
@@ -17539,6 +17521,8 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
 }
 
 async function sendToServer(data) {
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
     var nowdwn = 0;
     var done = 0;
     var unjson = data;
@@ -17563,7 +17547,6 @@ async function sendToServer(data) {
                 resolve(await a.dall(url, title, `${toFilename(title)}.mp4`, ffmpeg))
             } else {
                 var id = uuid.v4();
-                // // var file = fs.createWriteStream(`songs/${toFilename(title)}.mp3`);
                 var file = []; 
                 
                 var stream = ytdl(url, {
@@ -17583,22 +17566,7 @@ async function sendToServer(data) {
                         videoID: null,
                         audioID: id
                     });
-
-                    // function r() {
-                    //     return new Promise(async (resolve, reject) => {
-                    //         try {
-                    //             await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
-                    //             downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
-                    //             resolve();
-                    //         } catch (err) {
-                    //             setTimeout(async () => resolve(await r()), 1000);
-                    //         };
-                    //     });
-                    // }
-                    // await r();
-
-                    // console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-                    // sendPageMessage(`Downloaded ${title}`, "success");
+                    
                     resolve(true);
                 });
                 stream.on('error', err => {
@@ -17619,9 +17587,7 @@ async function sendToServer(data) {
     var p = 0;
 
     function dwn() {
-        var dsl = downloadProgessLimit;
-        if (unjson.type === "video") dsl = Math.floor(downloadProgessLimit / 2);
-        if (nowdwn < dsl) {
+        if (nowdwn < downloadProgessLimit) {
             download(unjson.videos[p]).then(e => {
                 nowdwn--;
                 done++;

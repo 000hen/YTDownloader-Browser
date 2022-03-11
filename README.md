@@ -43,6 +43,10 @@ Or the download button in the video page or song page.
 
 ## Some of Screenshots
 
-___Note: It will come out, but not now.___
+ * Notifications:  
+ ![Notifications](https://cdn.discordapp.com/attachments/698551378745884835/951779185557377054/unknown.png)
+
+ * Popup Window:  
+ ![Popup Window](hhttps://cdn.discordapp.com/attachments/698551378745884835/951785505090064414/unknown.png)
 
 ## Enjoy!

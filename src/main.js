@@ -24,7 +24,6 @@ const converter = global.converter = async () => {
     */
 
     if (nowConverting) return;
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
 
     var times = 0;
 
@@ -37,7 +36,7 @@ const converter = global.converter = async () => {
             downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.audioID}.mp3`), `${toFilename(nowConverting.title)}.mp3`);
         } else {
             await ffmpeg.run("-i", `${nowConverting.videoID}`, "-i", `${nowConverting.audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${nowConverting.videoID}.mp4`);
-            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), toFilename(nowConverting.title));
+            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), `${toFilename(nowConverting.title)}.mp4`);
         }
         console.log(`\x1b[32mDownloaded ${nowConverting.title}\x1b[0m`);
         sendPageMessage(`Downloaded ${nowConverting.title}`, "success");
@@ -69,6 +68,7 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
             active: true,
             currentWindow: true
         }, (tabs) => {
+            if (!tabs[0]) return;
             chrome.tabs.sendMessage(tabs[0].id, {
                 message: message,
                 type: type
@@ -78,6 +78,8 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
 }
 
 async function sendToServer(data) {
+    if (!ffmpeg.isLoaded()) await ffmpeg.load();
+
     var nowdwn = 0;
     var done = 0;
     var unjson = data;
@@ -142,9 +144,7 @@ async function sendToServer(data) {
     var p = 0;
 
     function dwn() {
-        var dsl = downloadProgessLimit;
-        if (unjson.type === "video") dsl = Math.floor(downloadProgessLimit / 2);
-        if (nowdwn < dsl) {
+        if (nowdwn < downloadProgessLimit) {
             download(unjson.videos[p]).then(e => {
                 nowdwn--;
                 done++;

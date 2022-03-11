@@ -75,7 +75,9 @@ window.addEventListener('load', e => {
                 var url = new URL(location.href);
                 switch (url.pathname) {
                     case "/watch":
-                        sendMessage([location.href], "music");
+                        var type = "music";
+                        if (request.type === "video") type = "video";
+                        sendMessage([location.href], type);
                         break;
                     
                     case "/playlist":
@@ -126,7 +128,9 @@ window.addEventListener('load', e => {
                             }
                             await p();
                         }
-                        sendMessage(t, "music");
+                        var type = "music";
+                        if (request.type === "video") type = "video"
+                        sendMessage(t, type);
                         break;
                 }
             }
@@ -135,11 +139,15 @@ window.addEventListener('load', e => {
                 var url = new URL(location.href);
                 switch (url.pathname) {
                     case "/watch":
-                        sendMessage([location.href], "video")
+                        var type = "video";
+                        if (request.type === "audio") type = "music"
+                        sendMessage([location.href], type)
                         break;
 
                     case "/playlist":
-                        sendMessage(location.href, "video")
+                        var type = "video";
+                        if (request.type === "audio") type = "music"
+                        sendMessage(location.href, type)
                         break;
                 }
             }

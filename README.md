@@ -51,7 +51,7 @@ Or the download button in the video page or song page.
  * Popup Window:  
  ![Popup Window](https://cdn.discordapp.com/attachments/698551378745884835/951785505090064414/unknown.png)
 
- * Background Console:
+ * Background Console:  
  ![Background Console](https://cdn.discordapp.com/attachments/698551378745884835/951785721969147924/unknown.png)
 
 ## Enjoy!

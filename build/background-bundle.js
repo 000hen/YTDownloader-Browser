@@ -17409,12 +17409,16 @@ function dall(ref, title, filename, ffmpeg) {
         video.on('end', () => {
             var buffer = Buffer.concat(rvideo);
             ffmpeg.FS('writeFile', `${videoID}`, buffer);
+            rvideo = [];
+            buffer = null;
             vddone = true;
         });
 
         audio.on('end', () => {
             var buffer = Buffer.concat(raudio);
             ffmpeg.FS('writeFile', `${audioID}`, buffer);
+            raudio = [];
+            buffer = null;
             addone = true;
         });
 
@@ -17476,10 +17480,15 @@ const converter = global.converter = async () => {
         sendPageMessage(`Converting ${nowConverting.title} from WebM to MP3...`, "info");
         if (!nowConverting.videoID) {
             await ffmpeg.run('-i', `${nowConverting.audioID}`, `${nowConverting.audioID}.mp3`);
+            ffmpeg.FS("unlink", `${nowConverting.audioID}`);
             downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.audioID}.mp3`), `${toFilename(nowConverting.title)}.mp3`);
+            ffmpeg.FS("unlink", `${nowConverting.audioID}.mp3`);
         } else {
             await ffmpeg.run("-i", `${nowConverting.videoID}`, "-i", `${nowConverting.audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${nowConverting.videoID}.mp4`);
+            ffmpeg.FS("unlink", `${nowConverting.videoID}`);
+            ffmpeg.FS("unlink", `${nowConverting.audioID}`);
             downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), `${toFilename(nowConverting.title)}.mp4`);
+            ffmpeg.FS("unlink", `${nowConverting.videoID}.mp4`);
         }
         console.log(`\x1b[32mDownloaded ${nowConverting.title}\x1b[0m`);
         sendPageMessage(`Downloaded ${nowConverting.title}`, "success");
@@ -17561,6 +17570,8 @@ async function sendToServer(data) {
                     var buffer = Buffer.concat(file);
                     // downloadAsFile(buffer, "test")
                     ffmpeg.FS('writeFile', `${id}`, buffer);
+                    file = [];
+                    buffer = null;
                     waitConverts.push({
                         title: title,
                         videoID: null,

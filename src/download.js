@@ -56,12 +56,16 @@ function dall(ref, title, filename, ffmpeg) {
         video.on('end', () => {
             var buffer = Buffer.concat(rvideo);
             ffmpeg.FS('writeFile', `${videoID}`, buffer);
+            rvideo = [];
+            buffer = null;
             vddone = true;
         });
 
         audio.on('end', () => {
             var buffer = Buffer.concat(raudio);
             ffmpeg.FS('writeFile', `${audioID}`, buffer);
+            raudio = [];
+            buffer = null;
             addone = true;
         });
 

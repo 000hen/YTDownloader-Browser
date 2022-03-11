@@ -78,24 +78,6 @@ function dall(ref, title, filename, ffmpeg) {
                 videoID: videoID,
                 audioID: audioID
             });
-            // console.log(`\x1b[33mStart making video and audio to "${title}"\x1b[0m`);
-            // sendPageMessage(`Start making video and audio to "${title}"`, "info");
-
-            // function r() {
-            //     return new Promise(async (resolve, reject) => {
-            //         try {
-            //             await ffmpeg.run("-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${videoID}.mp4`);
-            //             downloadAsFile(ffmpeg.FS("readFile", `${videoID}.mp4`), filename);
-            //             resolve();
-            //         } catch (err) {
-            //             setTimeout(async () => resolve(await r()), 1000);
-            //         };
-            //     });   
-            // }
-            // await r();
-
-            // console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-            // sendPageMessage(`Downloaded ${title}`, "success");
 
             resolve(true);
         }

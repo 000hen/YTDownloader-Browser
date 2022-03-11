@@ -102,7 +102,6 @@ async function sendToServer(data) {
                 resolve(await a.dall(url, title, `${toFilename(title)}.mp4`, ffmpeg))
             } else {
                 var id = uuid.v4();
-                // // var file = fs.createWriteStream(`songs/${toFilename(title)}.mp3`);
                 var file = []; 
                 
                 var stream = ytdl(url, {
@@ -122,22 +121,7 @@ async function sendToServer(data) {
                         videoID: null,
                         audioID: id
                     });
-
-                    // function r() {
-                    //     return new Promise(async (resolve, reject) => {
-                    //         try {
-                    //             await ffmpeg.run('-i', `${id}`, `${id}.mp3`);
-                    //             downloadAsFile(ffmpeg.FS("readFile", `${id}.mp3`), `${toFilename(title)}.mp3`);
-                    //             resolve();
-                    //         } catch (err) {
-                    //             setTimeout(async () => resolve(await r()), 1000);
-                    //         };
-                    //     });
-                    // }
-                    // await r();
-
-                    // console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-                    // sendPageMessage(`Downloaded ${title}`, "success");
+                    
                     resolve(true);
                 });
                 stream.on('error', err => {

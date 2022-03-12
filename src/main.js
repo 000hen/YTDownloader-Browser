@@ -5,9 +5,10 @@ const {
     createFFmpeg
 } = require('@ffmpeg/ffmpeg');
 const ffmpeg = createFFmpeg({
-    log: false
+    log: true
 });
 const downloadProgessLimit = 10;
+const convertingLimit = 100;
 
 var toFilename = string => string.replace(/\n/g, " ").replace(/[<>:"/\\|?*\x00-\x1F]| +$/g, "").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/, x => x + "_");
 
@@ -151,31 +152,36 @@ async function sendToServer(data) {
 
     var p = 0;
 
-    function dwn() {
-        if (nowdwn < downloadProgessLimit) {
-            download(unjson.videos[p]).then(e => {
-                nowdwn--;
-                done++;
-                if (done === unjson.videos.length) {
-                    if (errVds.length > 0) {
-                        console.log(`\x1b[31mDownloading Failed: ${errVds.length} videos\x1b[0m`);
-                        sendPageMessage(`Downloading Failed: ${errVds.length} videos`, "error");
-                        for (var video of errVds) {
-                            console.log(`\x1b[31mFailed: ${video}\x1b[0m`);
-                            sendPageMessage(`Failed: ${video}`, "error");
+    const sleep = ms => new Promise(res => setTimeout(res, ms))
+    async function dwn() {
+        var d = true;
+        while (d) {
+            d = p !== unjson.videos.length && done + 1 !== unjson.videos.length;
+            if (nowdwn < downloadProgessLimit && waitConverts.length < convertingLimit) {
+                download(unjson.videos[p]).then(e => {
+                    nowdwn--;
+                    done++;
+                    if (done === unjson.videos.length) {
+                        if (errVds.length > 0) {
+                            console.log(`\x1b[31mDownloading Failed: ${errVds.length} videos\x1b[0m`);
+                            sendPageMessage(`Downloading Failed: ${errVds.length} videos`, "error");
+                            for (var video of errVds) {
+                                console.log(`\x1b[31mFailed: ${video}\x1b[0m`);
+                                sendPageMessage(`Failed: ${video}`, "error");
+                            }
                         }
                     }
-                }
-            });
-            nowdwn++;
-            p++;
-        }
+                });
+                nowdwn++;
+                p++;
+            }
 
-        if (p !== unjson.videos.length && done + 1 !== unjson.videos.length) {
-            setTimeout(dwn, 500)
+            if (!d) break;
+            await sleep(500);
         }
+        return true;
     }
-    dwn();
+    await dwn();
 
     return true;
 }

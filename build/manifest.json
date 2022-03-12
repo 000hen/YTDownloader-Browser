@@ -23,8 +23,7 @@
     "permissions": [
       "tabs",
       "activeTab",
-      "https://*.googlevideo.com/*",
-      "blob:*"
+      "https://*.googlevideo.com/*"
     ],
   
     "icons": {

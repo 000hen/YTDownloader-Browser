@@ -17451,9 +17451,7 @@ const uuid = require('uuid');
 const {
     createFFmpeg
 } = require('@ffmpeg/ffmpeg');
-const ffmpeg = createFFmpeg({
-    log: true
-});
+
 const downloadProgessLimit = 10;
 const convertingLimit = 100;
 
@@ -17632,6 +17630,12 @@ async function sendToServer(data) {
 
     return true;
 }
+
+window.addEventListener("load", () => {
+    global.ffmpeg = createFFmpeg({
+        log: false
+    });
+});
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message === 'download') {

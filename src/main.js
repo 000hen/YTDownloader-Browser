@@ -1,59 +1,26 @@
 const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const uuid = require('uuid');
-const {
-    createFFmpeg
-} = require('@ffmpeg/ffmpeg');
+const ffmpeg = global.ffmpeg = require("ffmpeg.js/ffmpeg-mp4.js");
 
 const downloadProgessLimit = 10;
-const convertingLimit = 100;
 
 var toFilename = string => string.replace(/\n/g, " ").replace(/[<>:"/\\|?*\x00-\x1F]| +$/g, "").replace(/^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])$/, x => x + "_");
 
-var nowConverting = null;
-var waitConverts = global.waitConverts = [];
-const converter = global.converter = async () => {
-    /*
-    Example of waitConverts:
-        {
-            "title": "title",
-            "videoID": "videoID",
-            "audioID": "audioID"
-        }
-    */
-
-    if (nowConverting) return;
-
-    var times = 0;
-
-    while (waitConverts.length > 0) {
-        nowConverting = waitConverts.shift();
-        console.log(`\x1b[33mConverting ${nowConverting.title}...\x1b[0m`);
-        sendPageMessage(`Converting ${nowConverting.title}...`, "info");
-        if (!nowConverting.videoID) {
-            await ffmpeg.run('-i', `${nowConverting.audioID}`, `${nowConverting.audioID}.mp3`);
-            ffmpeg.FS("unlink", `${nowConverting.audioID}`);
-            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.audioID}.mp3`), `${toFilename(nowConverting.title)}.mp3`);
-            ffmpeg.FS("unlink", `${nowConverting.audioID}.mp3`);
-        } else {
-            await ffmpeg.run("-i", `${nowConverting.videoID}`, "-i", `${nowConverting.audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${nowConverting.videoID}.mp4`);
-            ffmpeg.FS("unlink", `${nowConverting.videoID}`);
-            ffmpeg.FS("unlink", `${nowConverting.audioID}`);
-            downloadAsFile(ffmpeg.FS("readFile", `${nowConverting.videoID}.mp4`), `${toFilename(nowConverting.title)}.mp4`);
-            ffmpeg.FS("unlink", `${nowConverting.videoID}.mp4`);
-        }
-        console.log(`\x1b[32mDownloaded ${nowConverting.title}\x1b[0m`);
-        sendPageMessage(`Downloaded ${nowConverting.title}`, "success");
-        times++;
+process.stderr = {
+    write: function (data) {
+        console.log(data);
     }
-    nowConverting = null;
-    console.log(`\x1b[32mDownloaded all file, in this session YouTube-Downloader downloaded ${times} file(s)\x1b[0m`);
-    sendPageMessage(`Downloaded all file, in this session YouTube-Downloader downloaded ${times} file(s)`, "success");
 }
-
-waitConverts.push = (e) => {
-    Array.prototype.push.call(waitConverts, e);
-    converter();
+process.stdout = {
+    write: function (data) {
+        console.log(data);
+    }
+}
+process.stdin = {
+    read: function (data) {
+        console.log(data);
+    }
 }
 
 const downloadAsFile = global.downloadAsFile = (blob, filename) => {
@@ -83,8 +50,6 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
 }
 
 async function sendToServer(data) {
-    if (!ffmpeg.isLoaded()) await ffmpeg.load();
-
     var nowdwn = 0;
     var done = 0;
     var unjson = data;
@@ -121,15 +86,12 @@ async function sendToServer(data) {
 
                 stream.on('end', async () => {
                     var buffer = Buffer.concat(file);
-                    // downloadAsFile(buffer, "test")
-                    ffmpeg.FS('writeFile', `${id}`, buffer);
-                    file = [];
-                    buffer = null;
-                    waitConverts.push({
-                        title: title,
-                        videoID: null,
-                        audioID: id
+
+                    var res = ffmpeg({
+                        MEMFS: [{ name: `${id}`, data: buffer }],
+                        arguments: ["-hide_banner", "-loglevel", "error", "-i", `${id}`, `${toFilename(title)}.mp3`]
                     });
+                    downloadAsFile(Buffer(res.MEMFS[0].data), `${toFilename(title)}.mp3`);
                     
                     resolve(true);
                 });
@@ -155,11 +117,13 @@ async function sendToServer(data) {
         var d = true;
         while (d) {
             d = p !== unjson.videos.length && done + 1 !== unjson.videos.length;
-            if (nowdwn < downloadProgessLimit && waitConverts.length < convertingLimit) {
+            if (nowdwn < downloadProgessLimit) {
                 download(unjson.videos[p]).then(e => {
                     nowdwn--;
                     done++;
                     if (done === unjson.videos.length) {
+                        console.log(`\x1b[32mDownloaded all file, in this session YouTube-Downloader downloaded ${done - errVds.length} file(s)\x1b[0m`);
+                        sendPageMessage(`Downloaded all file, in this session YouTube-Downloader downloaded ${done - errVds.length} file(s)`, "success");
                         if (errVds.length > 0) {
                             console.log(`\x1b[31mDownloading Failed: ${errVds.length} videos\x1b[0m`);
                             sendPageMessage(`Downloading Failed: ${errVds.length} videos`, "error");
@@ -184,11 +148,11 @@ async function sendToServer(data) {
     return true;
 }
 
-window.addEventListener("load", () => {
-    global.ffmpeg = createFFmpeg({
-        log: false
-    });
-});
+// window.addEventListener("load", () => {
+//     global.ffmpeg = createFFmpeg({
+//         log: false
+//     });
+// });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.message === 'download') {

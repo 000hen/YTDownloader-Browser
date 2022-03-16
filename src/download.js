@@ -54,18 +54,12 @@ function dall(ref, title, filename, ffmpeg) {
         });
 
         video.on('end', () => {
-            var buffer = Buffer.concat(rvideo);
-            ffmpeg.FS('writeFile', `${videoID}`, buffer);
-            rvideo = [];
-            buffer = null;
+            rvideo = Buffer.concat(rvideo);
             vddone = true;
         });
 
         audio.on('end', () => {
-            var buffer = Buffer.concat(raudio);
-            ffmpeg.FS('writeFile', `${audioID}`, buffer);
-            raudio = [];
-            buffer = null;
+            raudio = Buffer.concat(raudio);
             addone = true;
         });
 
@@ -77,13 +71,25 @@ function dall(ref, title, filename, ffmpeg) {
         }, 500);
 
         async function sff() {
-            waitConverts.push({
-                title: title,
-                videoID: videoID,
-                audioID: audioID
+            var res = ffmpeg({
+                MEMFS: [
+                    {
+                        name: `${audioID}`,
+                        data: raudio
+                    },
+                    {
+                        name: `${videoID}`,
+                        data: rvideo
+                    }
+                ],
+                arguments: ["-hide_banner", "-loglevel", "error", "-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", filename]
             });
+            downloadAsFile(Buffer(res.MEMFS[0].data), `${filename}.mp3`);
+            delete res.MEMFS[0];
+            delete raudio;
+            delete rvideo;
 
-            resolve(true);
+            return resolve(true);
         }
     })
 }

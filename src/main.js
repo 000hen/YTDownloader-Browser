@@ -87,11 +87,21 @@ async function sendToServer(data) {
                 stream.on('end', async () => {
                     var buffer = Buffer.concat(file);
 
+                    console.log(`\x1b[33mConverting ${title}...\x1b[0m`);
+                    sendPageMessage(`Converting ${title}...`, "info");
+
                     var res = ffmpeg({
                         MEMFS: [{ name: `${id}`, data: buffer }],
                         arguments: ["-hide_banner", "-loglevel", "error", "-i", `${id}`, `${toFilename(title)}.mp3`]
                     });
                     downloadAsFile(Buffer(res.MEMFS[0].data), `${toFilename(title)}.mp3`);
+
+                    delete res.MEMFS[0];
+                    delete buffer;
+                    delete file;
+
+                    console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
+                    sendPageMessage(`Downloaded ${title}`, "success");
                     
                     resolve(true);
                 });

@@ -71,6 +71,8 @@ function dall(ref, title, filename, ffmpeg) {
         }, 500);
 
         async function sff() {
+            console.log(`\x1b[33mConverting ${title}...\x1b[0m`);
+            sendPageMessage(`Converting ${title}...`, "info");
             var res = ffmpeg({
                 MEMFS: [
                     {
@@ -85,9 +87,13 @@ function dall(ref, title, filename, ffmpeg) {
                 arguments: ["-hide_banner", "-loglevel", "error", "-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", filename]
             });
             downloadAsFile(Buffer(res.MEMFS[0].data), `${filename}.mp3`);
+
             delete res.MEMFS[0];
             delete raudio;
             delete rvideo;
+
+            console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
+            sendPageMessage(`Downloaded ${title}`, "success");
 
             return resolve(true);
         }

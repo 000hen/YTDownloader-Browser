@@ -35,7 +35,8 @@ makezip:
 	make
 	mkdir -p $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cp -r $(BUILD_FOLDER)/*.* $(RELEASE_FOLDER)/$(BUILD_VERSION)
-	zip -r $(BUILD_VERSION).zip $(RELEASE_FOLDER)
+	cd $(RELEASE_FOLDER); \
+		zip -r $(BUILD_VERSION).zip $(BUILD_VERSION)
 
 clean:
 	make cleanbuild

@@ -13,7 +13,7 @@ This is a Chrome extension that allows you to download videos from YouTube/YouTu
 
 ## Installation
 
-_You can download the extension from the [release page](https://github.com/000hen/YouTube-Downloader/releases/latest)_
+_You can download the extension from the [release page](https://github.com/000hen/YTDownloader-Browser/releases/latest)_
 
  1. Download the repository.
  2. Install the npm package (`npm install`).

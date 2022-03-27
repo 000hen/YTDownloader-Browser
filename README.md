@@ -18,13 +18,13 @@ _You can download the extension from the [release page](https://github.com/000he
 
  1. Download the repository.
  2. Install the npm package (`npm install`).
- 3. Build the extension (`npm run build`).
+ 3. Build the extension (`make`).
  4. Install the Chrome extension in `build` folder with developer mode.
  5. Enjoy!
 
 ## How to Download The Videos or Songs
 
-**Remember the videos/playlists/songs must be public.**
+**Remember the videos/playlists/songs must be public. (Or you need to sign in)**
 
  1. Open the videos in the main YouTube page or open the songs in the YouTube Music page.
  2. Click the extension icon in the top right corner (You may need to pin it).

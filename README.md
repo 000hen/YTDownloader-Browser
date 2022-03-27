@@ -9,6 +9,7 @@ This is a Chrome extension that allows you to download videos from YouTube/YouTu
  * Download multiple YouTube/YouTube Music videos at once.
  * Download YouTube/YouTube Music videos from a playlist.
  * Download all your favortie YouTube Music songs.
+ * Download the Private videos. (You need to be logged in to download the private videos.)(alpha)
  * Intuitive download videos/songs tool.
 
 ## Installation

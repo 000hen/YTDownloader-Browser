@@ -290,7 +290,8 @@ window.addEventListener('load', e => {
         try {
             return chrome.runtime.sendMessage({
                 videos: videos,
-                type: type
+                type: type,
+                cookies: document.cookie
             });
         } catch (e) {
             console.log("[YTDownload-Browser] Cannot download video/song.")

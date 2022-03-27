@@ -71,13 +71,18 @@ async function sendToServer(data) {
             sendPageMessage(`Downloading ${title}, By ${author}...`, "info");
             if (unjson.type === "video") {
                 var a = require("./download.js");
-                resolve(await a.dall(url, title, `${toFilename(title)}.mp4`, ffmpeg))
+                resolve(await a.dall(url, title, toFilename(title), unjson.cookies))
             } else {
                 var id = uuid.v4();
                 var file = []; 
                 
                 var stream = ytdl(url, {
-                    filter: "audioonly"
+                    filter: "audioonly",
+                    requestOptions: {
+                        Headers: new Headers({
+                            Cookies: unjson.cookies
+                        })
+                    }
                 });
 
                 stream.on("data", chunk => {

@@ -3,10 +3,10 @@
   
     "name": "YTDownload-Browser",
     "description": "Download YouTube/YouTube Music videos",
-    "version": "1.0",
+    "version": "1.0.2",
 
     "content_scripts" : [{
-      "matches": ["https://music.youtube.com/*", "https://www.youtube.com/*"],
+      "matches": ["https://*.youtube.com/*"],
       "js": ["content-bundle.js"]
     }],
       
@@ -23,7 +23,8 @@
     "permissions": [
       "tabs",
       "activeTab",
-      "https://*.googlevideo.com/*"
+      "https://*.googlevideo.com/*",
+      "https://*.youtube.com/*"
     ],
   
     "icons": {

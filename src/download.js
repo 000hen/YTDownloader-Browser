@@ -1,19 +1,8 @@
-function dall(ref, title, filename, ffmpeg) {
+function dall(ref, title, filename, ytCookies) {
     return new Promise((resolve, reject) => {
         const uuid = require('uuid');
         const ytdl = require('ytdl-core');
         // Global constants
-        const tracker = {
-            start: Date.now(),
-            audio: {
-                downloaded: 0,
-                total: Infinity
-            },
-            video: {
-                downloaded: 0,
-                total: Infinity
-            },
-        };
 
         var videoID = uuid.v4();
         var audioID = uuid.v4();
@@ -24,24 +13,22 @@ function dall(ref, title, filename, ffmpeg) {
         // Get audio and video stream going
         const audio = ytdl(ref, {
             filter: 'audioonly',
-            quality: 'highestaudio'
+            quality: 'highestaudio',
+            requestOptions: {
+                Headers: new Headers({
+                    Cookies: ytCookies
+                })
+            }
         })
-            .on('progress', (_, downloaded, total) => {
-                tracker.audio = {
-                    downloaded,
-                    total
-                };
-            });
         const video = ytdl(ref, {
             filter: 'videoonly',
-            quality: 'highestvideo'
+            quality: 'highestvideo',
+            requestOptions: {
+                Headers: new Headers({
+                    Cookies: ytCookies
+                })
+            }
         })
-            .on('progress', (_, downloaded, total) => {
-                tracker.video = {
-                    downloaded,
-                    total
-                };
-            });
         
         var raudio = [];
         var rvideo = [];
@@ -86,7 +73,7 @@ function dall(ref, title, filename, ffmpeg) {
                 ],
                 arguments: ["-hide_banner", "-loglevel", "error", "-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", filename]
             });
-            downloadAsFile(Buffer(res.MEMFS[0].data), `${filename}.mp3`);
+            downloadAsFile(Buffer(res.MEMFS[0].data), `${filename}.mp4`);
 
             delete res.MEMFS[0];
             delete raudio;

@@ -49,7 +49,50 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
     } catch (e) { }
 }
 
+function getVerNumber(verName) {
+    verName = verName.replace("v", "");
+    verName = verName.split(".").map(e => Number(e));
+    var verNum = 0;
+    for (var i = 0; i < verName.length; i++) {
+        verNum += verName[2 - i] * Math.pow(100, i);
+    }
+
+    return verNum;
+}
+
+global.isCheckedUpdate = false;
+
+async function checkUpdate() {
+    var t = await fetch("https://api.github.com/repos/000hen/YTDownloader-Browser/releases").then(async e => await e.json());
+
+    var manifestData = chrome.runtime.getManifest();
+    var localVerNum = getVerNumber(manifestData.version);
+
+    var remoteVerNum = getVerNumber(t[0].tag_name);
+
+    if (localVerNum < remoteVerNum) {
+        chrome.notifications.create(String(Math.floor(Math.random() * 10000)), {
+            type: 'basic',
+            iconUrl: 'assets/icon/YTDownloader-Browser.png',
+            title: 'Found New Release',
+            message: `Found new YTDownload-Browser Release.\nVersion: ${t[0].tag_name}`,
+            buttons: [{
+                title: 'Download latest'
+            }],
+            priority: 2
+        });
+
+        chrome.notifications.onButtonClicked.addListener((callback, buttonIndex) => {
+            window.open("https://github.com/000hen/YTDownloader-Browser/releases/tag/v1.0.1");
+        });
+        sendPageMessage("Found new release", "info");
+        global.isCheckedUpdate = true;
+    }
+}
+
 async function sendToServer(data) {
+    checkUpdate();
+
     var nowdwn = 0;
     var done = 0;
     var unjson = data;

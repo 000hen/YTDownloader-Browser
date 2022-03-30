@@ -4,9 +4,9 @@ BUILD_FOLDER = build
 SOURCE_FOLDER = src
 RELEASE_FOLDER = release
 
-BUILD_VERSION = 1.0.1
+BUILD_VERSION = 1.0.2
 
-FILE = manifest.json main.js content.js popup.html popupScript.js version
+FILE = manifest.json main.js content.js popup.html popupScript.js assets version
 
 $(shell mkdir -p $(BUILD_FOLDER))
 $(shell mkdir -p $(RELEASE_FOLDER))
@@ -27,6 +27,9 @@ popup.html:
 
 popupScript.js:
 	cp $(SOURCE_FOLDER)/popupScript.js $(BUILD_FOLDER)/popupScript.js
+
+assets:
+	cp -r $(SOURCE_FOLDER)/assets $(BUILD_FOLDER)
 
 version:
 	echo $(BUILD_VERSION) > $(BUILD_FOLDER)/version

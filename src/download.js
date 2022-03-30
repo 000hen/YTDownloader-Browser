@@ -71,7 +71,7 @@ function dall(ref, title, filename, ytCookies) {
                         data: rvideo
                     }
                 ],
-                arguments: ["-hide_banner", "-loglevel", "error", "-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", filename]
+                arguments: ["-hide_banner", "-loglevel", "error", "-i", `${videoID}`, "-i", `${audioID}`, "-map", "0:v?", "-map", "1:a?", "-c:v", "copy", "-shortest", `${filename}.mp4`]
             });
             downloadAsFile(Buffer(res.MEMFS[0].data), `${filename}.mp4`);
 

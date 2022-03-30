@@ -1,14 +1,19 @@
-function dall(ref, title, filename, ytCookies) {
+function dall(ref, title, filename, ytCookies, unjson, errVds) {
     return new Promise((resolve, reject) => {
         const uuid = require('uuid');
         const ytdl = require('ytdl-core');
         // Global constants
+
+        var isError = false;
 
         var videoID = uuid.v4();
         var audioID = uuid.v4();
 
         var vddone = false;
         var addone = false;
+
+        var raudio = [];
+        var rvideo = [];
 
         // Get audio and video stream going
         const audio = ytdl(ref, {
@@ -28,10 +33,7 @@ function dall(ref, title, filename, ytCookies) {
                     Cookies: ytCookies
                 })
             }
-        })
-        
-        var raudio = [];
-        var rvideo = [];
+        });
 
         video.on("data", chunk => {
             rvideo.push(chunk);
@@ -56,6 +58,21 @@ function dall(ref, title, filename, ytCookies) {
                 sff();
             }
         }, 500);
+
+        function errorHandler(error) {
+            if (isError) return;
+            console.log(`\x1b[31mDownload ${title} Failed: ${error}\x1b[0m`, error);
+            sendPageMessage(`Download ${title} Failed: ${error}`, "error");
+            if (errVds.findIndex(e => e === ref) === -1) {
+                unjson.videos.push(ref);
+            }
+            errVds.push(ref);
+            resolve(false);
+            isError = true;
+        }
+
+        video.on('error', errorHandler);
+        audio.on('error', errorHandler);
 
         async function sff() {
             console.log(`\x1b[33mConverting ${title}...\x1b[0m`);

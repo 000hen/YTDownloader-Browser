@@ -34,16 +34,14 @@ assets:
 version:
 	echo $(BUILD_VERSION) > $(BUILD_FOLDER)/version
 
-makezip:
+release:
 	make
 	mkdir -p $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cp -r $(BUILD_FOLDER)/*.* $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cd $(RELEASE_FOLDER); \
 		zip -r $(BUILD_VERSION).zip $(BUILD_VERSION)
 
-clean:
-	make cleanbuild
-	make cleanrelease
+clean: cleanbuild cleanrelease
 
 cleanbuild:
 	rm -rf $(BUILD_FOLDER)

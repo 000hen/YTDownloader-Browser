@@ -1,7 +1,7 @@
 const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const uuid = require('uuid');
-const ffmpeg = global.ffmpeg = require("ffmpeg.js/ffmpeg-mp4.js");
+const ffmpeg = global.ffmpeg = require("ffmpeg.js/ffmpeg-mp4");
 
 const downloadProgessLimit = 10;
 
@@ -114,7 +114,7 @@ async function sendToServer(data) {
             sendPageMessage(`Downloading ${title}, By ${author}...`, "info");
             if (unjson.type === "video") {
                 var a = require("./download.js");
-                resolve(await a.dall(url, title, toFilename(title), unjson.cookies))
+                resolve(await a.dall(url, title, toFilename(title), unjson.cookies, unjson, errVds))
             } else {
                 var id = uuid.v4();
                 var file = []; 

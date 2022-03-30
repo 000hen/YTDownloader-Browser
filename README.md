@@ -6,6 +6,7 @@ This is a Chrome extension that allows you to download videos from YouTube/YouTu
 
 ## Features
 
+ * Download YouTube videos in SD, HD, Full HD, 4K, and even 8K.
  * Download multiple YouTube/YouTube Music videos at once.
  * Download YouTube/YouTube Music videos from a playlist.
  * Download all your favortie YouTube Music songs.

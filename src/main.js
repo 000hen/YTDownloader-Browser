@@ -63,6 +63,7 @@ function getVerNumber(verName) {
 global.isCheckedUpdate = false;
 
 async function checkUpdate() {
+    if (isCheckedUpdate) return;
     var t = await fetch("https://api.github.com/repos/000hen/YTDownloader-Browser/releases").then(async e => await e.json());
 
     var manifestData = chrome.runtime.getManifest();

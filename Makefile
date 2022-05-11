@@ -34,7 +34,7 @@ assets:
 version:
 	echo $(BUILD_VERSION) > $(BUILD_FOLDER)/version
 
-release:
+ziprelease:
 	make
 	mkdir -p $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cp -r $(BUILD_FOLDER)/*.* $(RELEASE_FOLDER)/$(BUILD_VERSION)

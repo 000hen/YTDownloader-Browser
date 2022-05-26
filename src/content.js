@@ -296,4 +296,4 @@ window.addEventListener('load', e => {
             console.log("[YTDownload-Browser] Cannot download video/song.")
         }
     }
-})
+});

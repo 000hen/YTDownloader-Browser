@@ -38,6 +38,7 @@ ziprelease:
 	make
 	mkdir -p $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cp -r $(BUILD_FOLDER)/*.* $(RELEASE_FOLDER)/$(BUILD_VERSION)
+	cp -r $(BUILD_FOLDER)/assets $(RELEASE_FOLDER)/$(BUILD_VERSION)
 	cd $(RELEASE_FOLDER); \
 		zip -r $(BUILD_VERSION).zip $(BUILD_VERSION)
 

@@ -17,10 +17,10 @@ manifest.json:
 	cp $(SOURCE_FOLDER)/manifest.json $(BUILD_FOLDER)/manifest.json
 
 main.js:
-	browserify $(SOURCE_FOLDER)/main.js -o $(BUILD_FOLDER)/background-bundle.js
+	browserify $(SOURCE_FOLDER)/main.js | uglifyjs > $(BUILD_FOLDER)/background-bundle.js
 
 content.js:
-	browserify $(SOURCE_FOLDER)/content.js -o $(BUILD_FOLDER)/content-bundle.js
+	browserify $(SOURCE_FOLDER)/content.js | uglifyjs > $(BUILD_FOLDER)/content-bundle.js
 
 popup.html:
 	cp $(SOURCE_FOLDER)/popup.html $(BUILD_FOLDER)

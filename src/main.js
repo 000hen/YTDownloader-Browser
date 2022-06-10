@@ -74,7 +74,7 @@ async function checkUpdate() {
     if (localVerNum < remoteVerNum) {
         chrome.notifications.create(String(Math.floor(Math.random() * 10000)), {
             type: 'basic',
-            iconUrl: 'assets/icon/YTDownloader-Browser.png',
+            iconUrl: 'assets/icon/512.png',
             title: 'Found New Release',
             message: `Found new YTDownload-Browser Release.\nVersion: ${t[0].tag_name}`,
             buttons: [{
@@ -84,7 +84,7 @@ async function checkUpdate() {
         });
 
         chrome.notifications.onButtonClicked.addListener((callback, buttonIndex) => {
-            window.open("https://github.com/000hen/YTDownloader-Browser/releases/tag/v1.0.1");
+            window.open("https://github.com/000hen/YTDownloader-Browser/releases/latest");
         });
         sendPageMessage("Found new release", "info");
         global.isCheckedUpdate = true;

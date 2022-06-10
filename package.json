@@ -1,6 +1,6 @@
 {
   "name": "ytdownload-browser",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Download the YouTube videos through browser.",
   "main": "./src/main.js",
   "scripts": {

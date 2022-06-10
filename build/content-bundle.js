@@ -157,8 +157,7 @@ window.addEventListener('load', e => {
         sendResponse(true);
     });
 
-    var dfu = location.href;
-    var d;
+    var dfu, d;
 
     function hhj() {
         if (location.hostname === "www.youtube.com") {
@@ -273,15 +272,20 @@ window.addEventListener('load', e => {
                     break;
             }
         }
+        dfu = location.href;
     }
-    hhj();
+    try {
+        hhj();
+    } catch (e) { }
 
     setInterval(() => {
         var l = location.href;
         if (l !== dfu) {
             dfu = l;
             if (d) d.remove();
-            hhj();
+            try {
+                hhj();
+            } catch (e) { }
         }
     }, 500);
 

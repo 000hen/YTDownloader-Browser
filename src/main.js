@@ -1,7 +1,7 @@
 const ytdl = require('ytdl-core');
 const ytpl = require('ytpl');
 const uuid = require('uuid');
-const ffmpeg = global.ffmpeg = require("ffmpeg.js/ffmpeg-mp4");
+const ffmpeg = global.ffmpeg = require("./lib/ffmpeg.js/ffmpeg-mp4");
 
 const downloadProgessLimit = 10;
 

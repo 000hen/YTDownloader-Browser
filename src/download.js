@@ -1,4 +1,4 @@
-function dall(ref, title, filename, ytCookies, unjson, errVds) {
+function dall(ref, title, filename, ytCookies, unjson, errVds, ID) {
     return new Promise((resolve, reject) => {
         const uuid = require('uuid');
         const ytdl = require('ytdl-core');
@@ -52,9 +52,12 @@ function dall(ref, title, filename, ytCookies, unjson, errVds) {
             addone = true;
         });
 
-        var k = setInterval(() => {
+        var k = setInterval(async () => {
             if (vddone && addone) {
                 clearInterval(k);
+                console.log(`\x1b[33mConverting ${title}...\x1b[0m`);
+                global.sendPageMessage(`Converting ${title}...`, "info", ID);
+                await global.wait(1000);
                 sff();
             }
         }, 500);
@@ -62,7 +65,7 @@ function dall(ref, title, filename, ytCookies, unjson, errVds) {
         function errorHandler(error) {
             if (isError) return;
             console.log(`\x1b[31mDownload ${title} Failed: ${error}\x1b[0m`, error);
-            sendPageMessage(`Download ${title} Failed: ${error}`, "error");
+            global.sendPageMessage(`Download ${title} Failed: ${error}`, "error", ID);
             if (errVds.findIndex(e => e === ref) === -1) {
                 unjson.videos.push(ref);
             }
@@ -75,8 +78,6 @@ function dall(ref, title, filename, ytCookies, unjson, errVds) {
         audio.on('error', errorHandler);
 
         async function sff() {
-            console.log(`\x1b[33mConverting ${title}...\x1b[0m`);
-            sendPageMessage(`Converting ${title}...`, "info");
             var res = ffmpeg({
                 MEMFS: [
                     {
@@ -97,7 +98,7 @@ function dall(ref, title, filename, ytCookies, unjson, errVds) {
             delete rvideo;
 
             console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-            sendPageMessage(`Downloaded ${title}`, "success");
+            global.sendPageMessage(`Downloaded ${title}`, "success", ID);
 
             return resolve(true);
         }

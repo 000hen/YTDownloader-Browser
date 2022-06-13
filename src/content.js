@@ -1,7 +1,12 @@
 window.addEventListener('load', e => {
     console.log('[YTDownload-Browser] Web script loaded.');
 
-    function makenof(message) {
+    var nofList = [];
+
+    function makenof(message, cleanUp = true) {
+        function makeid() {
+            return Math.floor(Math.random() * 100000000);
+        }
         if (!document.querySelector("#dwn-info")) {
             var doc = document.createElement("div");
             doc.id = "dwn-info";
@@ -40,36 +45,50 @@ window.addEventListener('load', e => {
                 return doc;
             }
 
+            const ID = makeid();
+            var doc;
+
             switch (message.type) {
                 case "info":
-                    var doc = createDoc("#914100");
+                    doc = createDoc("#914100");
                     doc.innerHTML = message.message;
+                    doc.setAttribute("data-msgid", ID);
                     document.querySelector("#dwn-info").appendChild(doc);
-                    setTimeout(() => doc.remove(), 5000);
                     break;
 
                 case "success":
-                    var doc = createDoc("#00b300");
+                    doc = createDoc("#00b300");
                     doc.innerHTML = message.message;
+                    doc.setAttribute("data-msgid", ID);
                     document.querySelector("#dwn-info").appendChild(doc);
-                    setTimeout(() => doc.remove(), 5000);
                     break;
 
                 case "error":
-                    var doc = createDoc("#ff0000");
+                    doc = createDoc("#ff0000");
                     doc.innerHTML = message.message;
+                    doc.setAttribute("data-msgid", ID);
                     document.querySelector("#dwn-info").appendChild(doc);
-                    setTimeout(() => doc.remove(), 5000);
                     break;
 
             }
+
+            if (cleanUp) setTimeout(() => doc.remove(), 5000);
+
+            return ID;
         } catch (e) {
             console.log(e);
         }
     }
 
+    function cleannof(id) {
+        var doc = document.querySelector("#dwn-info [data-msgid='" + id + "']");
+        if (!doc) return;
+        doc.remove();
+    }
+
     chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         if (request.message === "download") {
+            const ID = request.id;
             if (location.hostname === "music.youtube.com") {
                 var url = new URL(location.href);
                 switch (url.pathname) {
@@ -151,7 +170,19 @@ window.addEventListener('load', e => {
                 }
             }
         } else {
-            makenof(request);
+            if (request.id) {
+                // console.log(request);
+                if (nofList.findIndex(e => e.dwnID === request.id) !== -1) {
+                    cleannof(nofList.find(e => e.dwnID === request.id).nfID);
+                    nofList.splice(nofList.findIndex(e => e.dwnID === request.id), 1);
+                }
+                var autoClose = false;
+                if (request.message.startsWith("Downloaded")) autoClose = true;
+
+                nofList.push({ nfID: makenof(request, autoClose), dwnID: request.id });
+            } else {
+                makenof(request);
+            }
         }
         sendResponse(true);
     });
@@ -300,4 +331,12 @@ window.addEventListener('load', e => {
             console.log("[YTDownload-Browser] Cannot download video/song.")
         }
     }
+
+    document.addEventListener("visibilitychange", (event) => {
+        if (document.visibilityState === "hidden") {
+            for (var f of nofList) {
+                cleannof(f.nfID);
+            }
+        }
+    });
 });

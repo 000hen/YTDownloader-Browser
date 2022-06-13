@@ -6,6 +6,8 @@ This is a Chrome extension that allows you to download videos from YouTube/YouTu
 
 ## Features
 
+___The video limit is up to 2~3 hours, or the downloader will crash. (In my test. Maybe up to more than 3 hours.)___
+
  * Download YouTube videos in SD, HD, Full HD, 4K, and even 8K.
  * Download multiple YouTube/YouTube Music videos at once.
  * Download YouTube/YouTube Music videos from a playlist.

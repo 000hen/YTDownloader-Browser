@@ -34,7 +34,7 @@ const downloadAsFile = global.downloadAsFile = (blob, filename) => {
     return;
 }
 
-const sendPageMessage = global.sendPageMessage = (message, type) => {
+const sendPageMessage = global.sendPageMessage = async (message, type, id = null) => {
     try {
         chrome.tabs.query({
             active: true,
@@ -42,12 +42,15 @@ const sendPageMessage = global.sendPageMessage = (message, type) => {
         }, (tabs) => {
             if (!tabs[0]) return;
             chrome.tabs.sendMessage(tabs[0].id, {
-                message: message,
-                type: type
+                message,
+                type,
+                id
             });
         });
     } catch (e) { }
 }
+
+const wait = global.wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 function getVerNumber(verName) {
     verName = verName.replace("v", "");
@@ -108,14 +111,16 @@ async function sendToServer(data) {
 
     function download(url) {
         return new Promise(async (resolve, reject) => {
+            const ID = uuid.v4();
+
             var info = await ytdl.getBasicInfo(url);
             var title = info.player_response.videoDetails.title;
             var author = info.player_response.videoDetails.author;
             console.log(`\x1b[33mDownloading ${title}, By ${author}...\x1b[0m`);
-            sendPageMessage(`Downloading ${title}, By ${author}...`, "info");
+            sendPageMessage(`Downloading ${title}, By ${author}...`, "info", ID);
             if (unjson.type === "video") {
                 var a = require("./download.js");
-                resolve(await a.dall(url, title, toFilename(title), unjson.cookies, unjson, errVds))
+                resolve(await a.dall(url, title, toFilename(title), unjson.cookies, unjson, errVds, ID));
             } else {
                 var id = uuid.v4();
                 var file = []; 
@@ -137,10 +142,12 @@ async function sendToServer(data) {
                     var buffer = Buffer.concat(file);
 
                     console.log(`\x1b[33mConverting ${title}...\x1b[0m`);
-                    sendPageMessage(`Converting ${title}...`, "info");
+                    global.sendPageMessage(`Converting ${title}...`, "info", ID);
+
+                    await global.wait(1000);
 
                     var res = ffmpeg({
-                        MEMFS: [{ name: `${id}`, data: buffer }],
+                        MEMFS: [{ name: id, data: buffer }],
                         arguments: ["-hide_banner", "-loglevel", "error", "-i", `${id}`, `${toFilename(title)}.mp3`]
                     });
                     downloadAsFile(Buffer(res.MEMFS[0].data), `${toFilename(title)}.mp3`);
@@ -150,13 +157,13 @@ async function sendToServer(data) {
                     delete file;
 
                     console.log(`\x1b[32mDownloaded ${title}\x1b[0m`);
-                    sendPageMessage(`Downloaded ${title}`, "success");
+                    global.sendPageMessage(`Downloaded ${title}`, "success", ID);
                     
                     resolve(true);
                 });
                 stream.on('error', err => {
                     console.log(`\x1b[31mDownload ${title} Failed: ${err}\x1b[0m`, err);
-                    sendPageMessage(`Download ${title} Failed: ${err}`, "error");
+                    sendPageMessage(`Download ${title} Failed: ${err}`, "error", ID);
                     if (errVds.findIndex(e => e === url) === -1) {
                         unjson.videos.push(url);
                     }

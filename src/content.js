@@ -35,7 +35,7 @@ window.addEventListener('load', e => {
                 doc.style.width = "calc(100% - 40px)";
                 doc.style.backgroundColor = "#fff";
                 doc.style.color = fontColor;
-                doc.style.zIndex = 300;
+                doc.style.zIndex = 1000;
                 doc.style.borderRadius = "10px";
                 doc.style.boxShadow = "0px 0px 10px #000";
                 doc.style.padding = "10px";
@@ -170,6 +170,7 @@ window.addEventListener('load', e => {
                 }
             }
         } else {
+            if (document.visibilityState === "hidden") return sendResponse(true);
             if (request.id) {
                 // console.log(request);
                 if (nofList.findIndex(e => e.dwnID === request.id) !== -1) {

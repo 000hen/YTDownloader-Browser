@@ -13,6 +13,9 @@ $(shell mkdir -p $(RELEASE_FOLDER))
 
 all: $(FILE)
 
+lib:
+	cp -r $(SOURCE_FOLDER)/lib/ $(BUILD_FOLDER)
+
 manifest.json:
 	cp $(SOURCE_FOLDER)/manifest.json $(BUILD_FOLDER)/manifest.json
 

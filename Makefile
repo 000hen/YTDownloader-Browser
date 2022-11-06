@@ -4,7 +4,7 @@ BUILD_FOLDER = build
 SOURCE_FOLDER = src
 RELEASE_FOLDER = release
 
-BUILD_VERSION = 1.0.4
+BUILD_VERSION = 1.0.5
 
 FILE = manifest.json main.js content.js popup.html popupScript.js assets version
 
